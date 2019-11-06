@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/217362059.svg)](https://zenodo.org/badge/latestdoi/217362059)
 # A novel method to evaluate stream connectivity using trail cameras
 
 Christopher J. Bellucci, Mary E. Becker, Melissa Czarnowski, Corinne Fitting
