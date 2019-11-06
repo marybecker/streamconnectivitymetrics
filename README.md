@@ -2,8 +2,6 @@
 
 Christopher J. Bellucci, Mary E. Becker, Melissa Czarnowski, Corinne Fitting
 
-Submitted to River Research and Applications. 2019.  In revision
-
 ## Abstract
 Stream connectivity is important for the ecological health of the stream and downstream waters. In this study, we use the term stream connectivity to mean hydrologically connected pools and riffles along a longitudinal stream continuum.  There are thousands of man-made structures (i.e. dams, culverts, groundwater wells) in Connecticut that influence stream connectivity that can result in fragmentation of aquatic habitat. Techniques are needed to assess human alteration to stream connectivity like dams, culverts, and ground water withdrawals in order to prioritize for future management actions to restore stream connectivity. 
 
