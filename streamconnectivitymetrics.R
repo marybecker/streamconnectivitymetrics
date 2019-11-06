@@ -1,4 +1,7 @@
-setwd("P:/Projects/GitHub_Prj/streamconnectivitymetrics")
+setwd("") #Set working directory
+
+#####LOAD Packages################
+##########################################################################
 
 library(ggplot2)
 library(lubridate)
@@ -7,29 +10,23 @@ library(plyr)
 library(reshape2)
 library(stringr)
 
-fobs<-read.csv("data/TrailCam_FlowObs2017.csv",header=TRUE)
-fobs$Date<-make_date(year=fobs$Year,month=fobs$Month,day=fobs$Day)
-fobs$JDay<-yday(fobs$Date)
-fobs$DurObs<-ifelse(fobs$Obs>3,1,0)
-#fobs<- fobs[complete.cases(fobs),]
-#fobs$ObsGraph<- fobs$Obs-1
-#fobs$Obs_CAT<-factor(fobs$Obs_CAT,levels=c("Dry","No Flow","Low",
-#"Normal","Above Normal","Flood"))
+#####PREP DATA######################
+##########################################################################
 
-#RG Period Only
+fobs<-read.csv("data/fobs.csv",header=TRUE) #Average Flow Observation Data from Trail Cameras
+fobs$Date<-as.Date(fobs$Date) #Convert date to class date
+fobs$Month<-month(fobs$Date) #Add month for parsing
+fobs$JDay<-yday(fobs$Date) #Add julian day
+fobs$DurObs<-ifelse(fobs$Obs>3,1,0) #Identify disconnected observations
+
+#Limit data to Rearing and Growth Period Only (July - October Months)
 fobs<- fobs[which(fobs$Month==7 |fobs$Month==8| fobs$Month==9 | fobs$Month==10),]
-##Excluding Poland, Rocky Gutter, Beacon Hill Brook & Cobble Trib for paper
-fobs<- fobs[!(fobs$STA_SEQ==19708|fobs$STA_SEQ==19709|fobs$STA_SEQ==19600
-              |fobs$STA_SEQ==19460),]
 
 sites<- unique(fobs$STA_SEQ) ##list of stations
-site.name<-fobs[,1:2]
-site.name<-unique(site.name[c("STA_SEQ","Station_Name")])
-colnames(site.name)<-c("site","SName")
 flowmetric<- matrix(ncol=31,nrow=length(sites)) #Empty matrix for flow metrics
 
 #####RUN FLOW METRICS For All Sites################
-####################################
+##########################################################################
 
 for (i in 1:length(sites)){
 
@@ -119,42 +116,21 @@ colnames(flowmetric)<-c("MA","M50","M25","M75","MASept","M50Sept",
                         "GNF1","GNF2","GNF3","GNFL","GNFPL",
                         "T1","T2")
 flowmetric$site<- row.names(flowmetric)
-flowmetric<-merge(flowmetric,site.name,by="site")
-flowmetric$site<-factor(flowmetric$site,levels=c("19657","15244",
-                                                 "18513","16046","19141","15192",
-                                                 "15193"))
-flowmetric$SName<-factor(flowmetric$SName,levels=c("Bunnell Brook",
-                                                   "Cobble Brook",
-                                                 "Womenshenuck Brook",
-                                                 "Chidsey Brook",
-                                                 "Mill River",
-                                                 "Honeypot Brook US",
-                                                 "Honeypot Brook DS"))
 write.csv(flowmetric,"results/flowmetrics.csv")
 
+####CREATE PLOTS in Paper########
+##########################################################################
 
-
-
-
-####DURATION LINE PLOT########
-# site.name<-read.csv("sitename.csv",header=TRUE)
-# site.name<-site.name[order(site.name$N),]
-
+#Site data for plots
 site.name<- as.data.frame(sort(factor(unique(fobs$Station_Name))))
 colnames(site.name)[1]<-"Station_Name"
 site.name$N<-as.numeric(row.names(site.name))
 site.name$altname<-paste0("(",site.name$N,") ",word(site.name$Station_Name,1,2,sep=" "))
-site.name
 
+#####Flow Observation Plot###########################
 fobs<-merge(fobs,site.name,by="Station_Name")
 fobs$DurObs<-ifelse(fobs$Obs==1,"Dry",ifelse(fobs$DurObs==0,"Disconnected","Connected"))
 fobs$DurObs<-factor(fobs$DurObs)
-
-
-#f1a340
-#f7f7f7
-#998ec3
-
 cols<-c("Disconnected"="#b2abd2","Connected"="#0571b0","Dry"="#ca0020")
 
 fconnectdur<-
@@ -177,19 +153,13 @@ fconnectdur
 ggsave("figures/fconnectdur.jpg",fconnectdur,dpi=600)
 
 
-####USGS FLow Compare LINE plot###########
+####USGS FLow Compare LINE plot##########################################################
 fobs$NF<-ifelse(fobs$index>3 & fobs$Obs <3,"Reference Gages At or Above 25th Percentile Flows 
                 and Flow Disconnected","Reference Gages Below 25th Percentile Flows")
 fobs$NF<-factor(fobs$NF)
 cols<-c("Reference Gages At or Above 25th Percentile Flows 
                 and Flow Disconnected"="cadetblue",
         "Reference Gages Below 25th Percentile Flows"="gray25")
-
-# fobs$NF<-ifelse(fobs$index>3,"Reference Gages At or Above 25th Percentile Flows",
-#                 "Reference Gages Below 25th Percentile Flows")
-# cols<-c("Reference Gages At or Above 25th Percentile Flows"="cadetblue",
-#         "Reference Gages Below 25th Percentile Flows"="gray25")
-
 xstart <- min(fobs$Date)-30  ##Specified for plot to ensure rects coverage
 xend <- max(fobs$Date)+30
  
