@@ -12,10 +12,16 @@ We developed a method to characterize stream connectivity using commercially ava
 
 ## Requirements
 
-R 3.5+
+R 3.5+ 
+
 ggplot2
+
 lubridate
+
 grid
+
 plyr
+
 reshape2
+
 stringr
